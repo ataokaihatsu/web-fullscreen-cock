@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>太い丸ゴシック時計</title>
+
+  <!-- Google Fonts: M PLUS Rounded 1c -->
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&family=Noto+Serif+JP&family=Roboto&family=Pacifico&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #000;
+      --text-color: #fff;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      font-weight: 700;
+      font-size: 10vw; /* サイズ調整 */
+      transition: all 0.3s ease;
+    }
+
+    .controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    select, button, input[type="color"] {
+      font-size: 16px;
+      padding: 5px 10px;
+      margin: 5px;
+    }
+
+    label {
+      font-size: 16px;
+      font-weight: 500; /* ラベルを少し強調 */
+    }
+
+    #clock {
+      user-select: none;
+      text-align: center;
+      line-height: 1;
+      margin-top: 50px; /* 時計を少し下に配置 */
+    }
+
+    .light-theme {
+      --bg-color: #fff;
+      --text-color: #000;
+    }
+
+    /* 小さい画面でも崩れないように調整 */
+    @media screen and (max-width: 600px) {
+      body {
+        font-size: 12vw; /* 小さい画面でもサイズ調整 */
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <select id="fontSelector">
+      <option value="'M PLUS Rounded 1c', sans-serif" data-weight="700">M PLUS Rounded（太め）</option>
+      <option value="'Noto Serif JP', serif" data-weight="400">Noto Serif JP</option>
+      <option value="'Roboto', sans-serif" data-weight="400">Roboto</option>
+      <option value="'Pacifico', cursive" data-weight="400">Pacifico</option>
+    </select>
+
+    <button id="timeFormatToggle">24時間表記</button>
+
+    <label for="bgColorPicker">背景色:</label>
+    <input type="color" id="bgColorPicker" value="#000000" />
+
+    <label for="textColorPicker">文字色:</label>
+    <input type="color" id="textColorPicker" value="#ffffff" />
+  </div>
+
+  <div id="clock">--:--:--</div>
+
+  <script>
+    const clock = document.getElementById('clock');
+    const selector = document.getElementById('fontSelector');
+    const formatToggle = document.getElementById('timeFormatToggle');
+    const body = document.body;
+    const bgColorPicker = document.getElementById('bgColorPicker');
+    const textColorPicker = document.getElementById('textColorPicker');
+
+    let use24Hour = true;
+
+    function updateClock() {
+      const now = new Date();
+      let h = now.getHours();
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      let period = '';
+
+      if (!use24Hour) {
+        period = h >= 12 ? ' PM' : ' AM';
+        h = h % 12;
+        h = h === 0 ? 12 : h;
+      }
+
+      h = String(h).padStart(2, '0');
+      clock.textContent = `${h}:${m}:${s}${period}`;
+    }
+
+    // 初期表示と更新
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // フォント切り替え
+    selector.addEventListener('change', () => {
+      const selected = selector.options[selector.selectedIndex];
+      const font = selected.value;
+      const weight = selected.dataset.weight || '400';
+      body.style.fontFamily = font;
+      body.style.fontWeight = weight;
+    });
+
+    // 時刻表記切り替え
+    formatToggle.addEventListener('click', () => {
+      use24Hour = !use24Hour;
+      formatToggle.textContent = use24Hour ? '24時間表記' : '12時間表記';
+      updateClock();
+    });
+
+    // 背景色の変更
+    bgColorPicker.addEventListener('input', (e) => {
+      const color = e.target.value;
+      body.style.setProperty('--bg-color', color);
+    });
+
+    // 文字色の変更
+    textColorPicker.addEventListener('input', (e) => {
+      const color = e.target.value;
+      body.style.setProperty('--text-color', color);
+    });
+  </script>
+</body>
+</html>
